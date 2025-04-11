@@ -20,6 +20,7 @@ enum class SilkSupport {
 
 fun createMainFunction(
     appFrontendData: AppFrontendData,
+    useCustomRenderer: Boolean,
     silkSupport: SilkSupport,
     appGlobals: Map<String, String>,
     cleanUrls: Boolean,
@@ -46,7 +47,11 @@ fun createMainFunction(
             "$KOBWEB_GROUP.navigation.UpdateHistoryMode",
             "kotlinx.browser.document",
             "kotlinx.browser.window",
-            "org.jetbrains.compose.web.renderComposable",
+            if (useCustomRenderer) {
+                "com.varabyte.kobweb.compose.internal.runtime.renderComposable"
+            } else {
+                "org.jetbrains.compose.web.internal.runtime.renderComposable"
+            },
         )
         addAll(defaultImports)
         if (target == BuildTarget.DEBUG) {

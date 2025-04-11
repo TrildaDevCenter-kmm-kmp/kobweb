@@ -58,17 +58,23 @@ abstract class KobwebGenerateSiteEntryTask @Inject constructor(
                 if (left) SilkSupport.FULL else if (right) SilkSupport.FOUNDATION else SilkSupport.NONE
             }
 
+    @get:Input
+    val useCustomRenderer: Provider<Boolean>
+        get() = dependencies.hasDependencyNamed("com.varabyte.kobweb:kobweb-custom-renderer")
+
     @OutputDirectory // needs to be dir to be registered as a kotlin srcDir
-    fun getGenMainFile() = appBlock.getGenJsSrcRoot()
+    fun getSrcRoot() = appBlock.getGenJsSrcRoot()
 
     @TaskAction
     fun execute() {
         val appFrontendData = Json.decodeFromString<AppFrontendData>(appDataFile.asFile.get().readText())
-        val mainFile = getGenMainFile().get().asFile.resolve("main.kt")
+
+        val mainFile = getSrcRoot().get().asFile.resolve("main.kt")
 
         mainFile.writeText(
             createMainFunction(
                 appFrontendData,
+                useCustomRenderer.get(),
                 silkSupport.get(),
                 globals.get(),
                 cleanUrls.get(),
